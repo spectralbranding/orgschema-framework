@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config-org Compliance Specification",
+  "description": "Schema for compliance YAML files (food safety, allergens)",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "standard": { "type": "string" },
+    "scope": { "type": "string" },
+    "responsible": { "type": "string" },
+    "last_review": {
+      "type": "string",
+      "format": "date"
+    },
+    "next_review": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "additionalProperties": true
+}

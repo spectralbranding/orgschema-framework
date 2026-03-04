@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config-org Product Specification",
+  "description": "Schema for product YAML files in the config-org TDD cascade (L3 implementation layer)",
+  "type": "object",
+  "required": ["version", "id", "name", "category", "available"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["hot_beverage", "cold_beverage", "bakery", "food"]
+    },
+    "available": {
+      "type": "boolean"
+    },
+    "satisfies_signal": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^L1_"
+      }
+    },
+    "satisfies_experience": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^L0_"
+      }
+    },
+    "description": {
+      "type": "string"
+    },
+    "preparation": {
+      "type": "object",
+      "required": ["method", "equipment", "steps"],
+      "properties": {
+        "method": { "type": "string" },
+        "equipment": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "steps": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "ingredients": {
+      "type": "array",
+      "items": { "type": "object" }
+    },
+    "nutrition": {
+      "type": "object"
+    },
+    "allergens": {
+      "type": "object",
+      "required": ["declared"],
+      "properties": {
+        "declared": {},
+        "cross_contamination": {
+          "type": "array",
+          "items": { "type": "object" }
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "required": ["total_cogs", "currency"],
+      "properties": {
+        "total_cogs": { "type": "number" },
+        "currency": {
+          "type": "string",
+          "enum": ["EUR", "USD", "GBP"]
+        }
+      }
+    },
+    "pricing": {
+      "type": "object",
+      "required": ["price", "currency"],
+      "properties": {
+        "price": { "type": "number" },
+        "currency": {
+          "type": "string",
+          "enum": ["EUR", "USD", "GBP"]
+        },
+        "margin_pct": { "type": "number" }
+      }
+    },
+    "modifiers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "description"],
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "price_adjustment": { "type": "number" }
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

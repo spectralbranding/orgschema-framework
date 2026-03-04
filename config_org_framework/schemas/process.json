@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config-org Process Specification",
+  "description": "Schema for process YAML files (L2 unit tests / L3 implementation layer)",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "satisfies_signal": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^L1_"
+      }
+    },
+    "satisfies_experience": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^L0_"
+      }
+    },
+    "description": { "type": "string" },
+    "standards_reference": {
+      "type": "array",
+      "items": { "type": "object" }
+    }
+  },
+  "additionalProperties": true
+}

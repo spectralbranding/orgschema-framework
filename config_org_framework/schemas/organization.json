@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Config-org Organization Specification",
+  "description": "Schema for organization.yaml (root identity layer)",
+  "type": "object",
+  "required": ["name", "type", "version"],
+  "properties": {
+    "name": { "type": "string" },
+    "type": { "type": "string" },
+    "mission": { "type": "string" },
+    "values": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "founded": { "type": "integer" },
+    "execution_profile": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["human_artisan", "human_standard", "hybrid", "automated"]
+        }
+      }
+    },
+    "locations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "address"],
+        "properties": {
+          "id": { "type": "string" },
+          "address": { "type": "string" },
+          "timezone": { "type": "string" }
+        }
+      }
+    },
+    "roles": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": true
+}
