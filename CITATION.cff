@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+title: "Configuration-First Organization Framework"
+message: "If you use this framework, please cite it as below."
+type: software
+authors:
+  - family-names: Zharnikov
+    given-names: Dmitri
+    orcid: ""
+repository-code: "https://github.com/spectralbranding/config-org-framework"
+url: "https://github.com/spectralbranding/config-org-framework"
+abstract: >
+  A reverse-design TDD methodology for business operations. Businesses
+  are designed backward from customer experience goals using testable,
+  version-controlled specifications where each operational layer validates
+  the layer above it. Includes JSON Schema validators for the 6-level
+  TDD cascade.
+keywords:
+  - test-driven-development
+  - business-operations
+  - reverse-design
+  - configuration-management
+  - spectral-brand-theory
+license: MIT
+version: 0.1.0
+date-released: "2026-03-04"
