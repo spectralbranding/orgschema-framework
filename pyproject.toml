@@ -19,6 +19,10 @@ orgschema-validate = "orgschema_framework.validate:main"
 
 [dependency-groups]
 dev = [
+    "black>=24.0",
+    "flake8>=7.0",
+    "mypy>=1.8",
+    "pytest>=7.0",
     "types-pyyaml>=6.0.12.20250915",
 ]
 
