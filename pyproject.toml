@@ -1,7 +1,7 @@
 [project]
-name = "config-org-framework"
+name = "orgschema-framework"
 version = "0.1.0"
-description = "Schema validator for Config-org Reverse-Design TDD specifications"
+description = "Schema validator for Organizational Schema Theory reverse-design TDD specifications"
 requires-python = ">=3.12"
 dependencies = [
     "pyyaml>=6.0",
@@ -15,7 +15,7 @@ dev = [
 ]
 
 [project.scripts]
-config-org-validate = "config_org_framework.validate:main"
+orgschema-validate = "orgschema_framework.validate:main"
 
 [dependency-groups]
 dev = [

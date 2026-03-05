@@ -1,10 +1,10 @@
-# Config-Org Framework
+# Orgschema Framework
 
-A schema validator for [Configuration-First Organization](https://github.com/spectralbranding/config-org-demo) specifications -- reverse-design TDD for business operations.
+A schema validator for [Organizational Schema Theory](https://github.com/spectralbranding/orgschema-demo) specifications -- reverse-design TDD for business operations.
 
-## What is Config-Org?
+## What is Orgschema?
 
-Config-org is a methodology where businesses are designed **backward** from customer experience goals using testable, version-controlled YAML specifications. Each operational layer validates the layer above it, forming a multi-level TDD cascade:
+Organizational Schema Theory is a methodology where businesses are designed **backward** from customer experience goals using testable, version-controlled YAML specifications. Each operational layer validates the layer above it, forming a multi-level TDD cascade:
 
 ```
 L0: Customer Experience Contract  →  acceptance tests
@@ -23,8 +23,8 @@ Requires Python 3.12+.
 
 ```bash
 # Clone the framework
-git clone https://github.com/spectralbranding/config-org-framework.git
-cd config-org-framework
+git clone https://github.com/spectralbranding/orgschema-framework.git
+cd orgschema-framework
 
 # Install with uv (recommended)
 uv sync
@@ -35,21 +35,21 @@ pip install -e .
 
 ## Quick Start
 
-Validate the [Spectra Coffee demo](https://github.com/spectralbranding/config-org-demo) specifications:
+Validate the [Spectra Coffee demo](https://github.com/spectralbranding/orgschema-demo) specifications:
 
 ```bash
 # Clone the demo repository
-git clone https://github.com/spectralbranding/config-org-demo.git
+git clone https://github.com/spectralbranding/orgschema-demo.git
 
 # Run the validator against it
-config-org-validate ./config-org-demo
+orgschema-validate ./orgschema-demo
 ```
 
 Expected output (all levels passing):
 
 ```
-=== Config-Org TDD Cascade Validator ===
-Validating: ./config-org-demo
+=== Orgschema TDD Cascade Validator ===
+Validating: ./orgschema-demo
 
 Level 1: Schema Validation
   [PASS] organization.yaml
@@ -86,7 +86,7 @@ Levels 3 (contract satisfaction) and 6 (waste detection) are planned for future 
 
 ## Schemas
 
-Four JSON Schema files define the structure of config-org specifications:
+Four JSON Schema files define the structure of orgschema specifications:
 
 | Schema | Validates | Required Fields |
 |:-------|:----------|:----------------|
@@ -110,8 +110,8 @@ All schemas use JSON Schema Draft 2020-12 and allow additional properties for ex
 ## Project Structure
 
 ```
-config-org-framework/
-├── config_org_framework/
+orgschema-framework/
+├── orgschema_framework/
 │   ├── __init__.py
 │   ├── validate.py          # CLI validator (4 validation levels)
 │   └── schemas/
@@ -128,15 +128,15 @@ config-org-framework/
 Add the validator to your GitHub Actions workflow:
 
 ```yaml
-- name: Validate config-org specifications
+- name: Validate orgschema specifications
   run: |
-    pip install -e path/to/config-org-framework
-    config-org-validate .
+    pip install -e path/to/orgschema-framework
+    orgschema-validate .
 ```
 
 The validator returns exit code 1 on errors, making it suitable for CI/CD pipelines. Warnings are non-fatal.
 
-See [config-org-demo/.github/workflows/ci.yml](https://github.com/spectralbranding/config-org-demo/blob/main/.github/workflows/ci.yml) for a working example.
+See [orgschema-demo/.github/workflows/ci.yml](https://github.com/spectralbranding/orgschema-demo/blob/main/.github/workflows/ci.yml) for a working example.
 
 ## Writing Your First Specification
 
@@ -179,23 +179,23 @@ satisfies_experience:
   - "L0_product_excellence"
 ```
 
-Run `config-org-validate .` to check your work. The validator will tell you what is missing or misconfigured.
+Run `orgschema-validate .` to check your work. The validator will tell you what is missing or misconfigured.
 
 ## Related Projects
 
-- **[config-org-demo](https://github.com/spectralbranding/config-org-demo)** -- Spectra Coffee: a complete demonstration of the config-org methodology (23 YAML files, 6 products, full TDD cascade)
-- **[sbt-framework](https://github.com/spectralbranding/sbt-framework)** -- Spectral Brand Theory: the perception measurement framework that provides config-org's L0-L1 test specification language
+- **[orgschema-demo](https://github.com/spectralbranding/orgschema-demo)** -- Spectra Coffee: a complete demonstration of the orgschema methodology (23 YAML files, 6 products, full TDD cascade)
+- **[sbt-framework](https://github.com/spectralbranding/sbt-framework)** -- Spectral Brand Theory: the perception measurement framework that provides orgschema's L0-L1 test specification language
 
 ## Citation
 
 If you use this framework in academic work:
 
 ```bibtex
-@software{zharnikov2026configorg,
+@software{zharnikov2026orgschema,
   author = {Zharnikov, Dmitri},
-  title = {Configuration-First Organization Framework},
+  title = {Organizational Schema Theory Framework},
   year = {2026},
-  url = {https://github.com/spectralbranding/config-org-framework},
+  url = {https://github.com/spectralbranding/orgschema-framework},
   version = {0.1.0}
 }
 ```

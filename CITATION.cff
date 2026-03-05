@@ -1,13 +1,13 @@
 cff-version: 1.2.0
-title: "Configuration-First Organization Framework"
+title: "Organizational Schema Theory Framework"
 message: "If you use this framework, please cite it as below."
 type: software
 authors:
   - family-names: Zharnikov
     given-names: Dmitri
     orcid: ""
-repository-code: "https://github.com/spectralbranding/config-org-framework"
-url: "https://github.com/spectralbranding/config-org-framework"
+repository-code: "https://github.com/spectralbranding/orgschema-framework"
+url: "https://github.com/spectralbranding/orgschema-framework"
 abstract: >
   A reverse-design TDD methodology for business operations. Businesses
   are designed backward from customer experience goals using testable,

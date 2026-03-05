@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Config-org Product Specification",
-  "description": "Schema for product YAML files in the config-org TDD cascade (L3 implementation layer)",
+  "title": "Orgschema Product Specification",
+  "description": "Schema for product YAML files in the orgschema TDD cascade (L3 implementation layer)",
   "type": "object",
   "required": ["version", "id", "name", "category", "available"],
   "properties": {

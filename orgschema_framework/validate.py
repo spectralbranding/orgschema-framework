@@ -1,12 +1,12 @@
-"""Config-org YAML schema validator.
+"""Organizational Schema Theory YAML schema validator.
 
 Implements the first two levels of the 6-level CI/CD validation pipeline:
 1. Schema validation — "Is this valid YAML with required fields?"
 2. Cross-reference integrity — "Do all linked specs exist and are consistent?"
 
 Usage:
-    config-org-validate /path/to/config-org-demo
-    python -m config_org_framework.validate /path/to/config-org-demo
+    orgschema-validate /path/to/orgschema-demo
+    python -m orgschema_framework.validate /path/to/orgschema-demo
 """
 
 import datetime
@@ -252,7 +252,7 @@ def validate_experience_traceability(root: Path) -> list[str]:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: config-org-validate <path-to-config-org-demo>")
+        print("Usage: orgschema-validate <path-to-orgschema-demo>")
         sys.exit(1)
 
     root = Path(sys.argv[1]).resolve()

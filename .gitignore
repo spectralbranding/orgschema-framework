@@ -1,0 +1,18 @@
+# Claude Code local settings (keep commands/ tracked)
+.claude/*
+!.claude/commands/
+!.claude/templates/
+!.claude/skills/
+!.claude/hooks/
+
+# Machine-specific MCP config (use .mcp.json.silicon or .mcp.json.intel templates)
+.mcp.json
+
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
