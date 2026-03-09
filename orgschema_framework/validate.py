@@ -15,7 +15,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from jsonschema import Draft202012Validator, ValidationError
+from jsonschema import Draft202012Validator
 
 SCHEMA_DIR = Path(__file__).parent / "schemas"
 
@@ -29,7 +29,7 @@ SCHEMA_MAP = {
 
 
 def normalize_yaml_data(data):
-    """Convert YAML-parsed date objects to ISO strings for JSON Schema validation."""
+    """Convert YAML-parsed date objects to ISO strings."""
     if isinstance(data, dict):
         return {k: normalize_yaml_data(v) for k, v in data.items()}
     if isinstance(data, list):
@@ -67,7 +67,8 @@ def validate_schema(root: Path) -> list[str]:
             with open(filepath) as f:
                 data = yaml.safe_load(f)
         except yaml.YAMLError as e:
-            errors.append(f"YAML parse error in {filepath.relative_to(root)}: {e}")
+            rel = filepath.relative_to(root)
+            errors.append(f"YAML parse error in {rel}: {e}")
             continue
 
         if data is None:
@@ -203,13 +204,13 @@ def validate_signal_coverage(root: Path) -> list[str]:
                     implemented_signals.add(req["id"])
                 else:
                     warnings.append(
-                        f"Signal {req['id']} references missing file: {impl_file}"
+                        f"Signal {req['id']} references " f"missing file: {impl_file}"
                     )
 
     covered = referenced_signals | implemented_signals
     uncovered = all_signal_ids - covered
     for sig_id in sorted(uncovered):
-        warnings.append(f"Signal coverage gap: {sig_id} has no satisfying spec")
+        warnings.append(f"Signal coverage gap: {sig_id} " f"has no satisfying spec")
 
     return warnings
 
