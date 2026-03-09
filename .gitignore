@@ -1,11 +1,19 @@
-# Claude Code local settings (keep commands/ tracked)
-.claude/*
-!.claude/commands/
-!.claude/templates/
-!.claude/skills/
-!.claude/hooks/
+# Claude Code local settings
+.claude/
 
-# Machine-specific MCP config (use .mcp.json.silicon or .mcp.json.intel templates)
+# Claude decision traces
+.claude-decisions/
+
+# Skills (fleet-specific)
+skills/
+
+# IDE configs
+.clinerules
+.cursorrules
+.cursorignore
+.rooignore
+
+# Machine-specific MCP config
 .mcp.json
 
 # macOS
@@ -16,3 +24,6 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# Linting
+.flake8
