@@ -183,7 +183,7 @@ Run `orgschema-validate .` to check your work. The validator will tell you what 
 
 ## Related Projects
 
-- **[orgschema-demo](https://github.com/spectralbranding/orgschema-demo)** -- Spectra Coffee: a complete demonstration of the orgschema methodology (23 YAML files, 6 products, full TDD cascade)
+- **[orgschema-demo](https://github.com/spectralbranding/orgschema-demo)** -- Spectra Coffee: a complete demonstration of the orgschema methodology (25 YAML files, 6 products, full TDD cascade)
 - **[sbt-framework](https://github.com/spectralbranding/sbt-framework)** -- Spectral Brand Theory: the perception measurement framework that provides orgschema's L0-L1 test specification language
 
 ## Citation
