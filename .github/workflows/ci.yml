@@ -41,7 +41,7 @@ jobs:
 
       - name: ⚖️ Lint (Flake8)
         if: hashFiles('pyproject.toml') != ''
-        run: uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=.venv,venv,node_modules,archive,ARCHIVE
+        run: uv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: 🔍 Type Check (MyPy)
         if: hashFiles('pyproject.toml') != ''
