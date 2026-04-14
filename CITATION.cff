@@ -4,8 +4,9 @@ message: "If you use this framework, please cite it as below."
 type: software
 authors:
   - family-names: Zharnikov
-    given-names: Dmitri
-    orcid: ""
+    given-names: Dmitry
+    orcid: "https://orcid.org/0009-0000-6893-9231"
+    email: dmitry@spectralbranding.com
 repository-code: "https://github.com/spectralbranding/orgschema-framework"
 url: "https://github.com/spectralbranding/orgschema-framework"
 abstract: >
