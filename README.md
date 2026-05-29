@@ -1,3 +1,7 @@
+[![MIT License](https://img.shields.io/badge/Code-MIT-blue.svg)](LICENSE)
+[![CC-BY 4.0](https://img.shields.io/badge/Data-CC--BY_4.0-lightgrey.svg)](LICENSE-data)
+![Last Updated](https://img.shields.io/badge/updated-2026--05--29-success)
+
 # Orgschema Framework
 
 A schema validator for [Organizational Schema Theory](https://github.com/spectralbranding/orgschema-demo) specifications -- reverse-design TDD for business operations.
@@ -205,3 +209,116 @@ See `CITATION.cff` for the full citation metadata.
 ## License
 
 MIT
+
+---
+
+## 1 | Getting Started
+
+Clone the repository and enter the directory:
+
+```bash
+git clone https://github.com/spectralbranding/orgschema-framework.git
+cd orgschema-framework
+```
+
+Python dependencies are managed via `uv` (Python ≥ 3.12):
+
+```bash
+uv sync --extra dev
+```
+
+The project anchor is `pyproject.toml` at the repository root.
+
+---
+
+## 2 | Project Layout
+
+```
+.
+├── orgschema_framework/    # Python package (CLI validator + JSON schemas)
+│   ├── __init__.py
+│   ├── validate.py
+│   └── schemas/
+│       ├── compliance.json
+│       ├── organization.json
+│       ├── process.json
+│       └── product.json
+├── output/                 # Generated artifacts
+│   ├── figures/
+│   ├── tables/
+│   └── logs/               # reproduce.sh master_run.log lands here
+├── CITATION.cff            # Machine-readable citation
+├── LICENSE                 # MIT (code)
+├── LICENSE-data            # CC BY 4.0 (data + figures + schemas)
+├── pyproject.toml          # Python project anchor + dependencies
+├── reproduce.sh            # Single-command reproduction
+├── README.md               # This file
+└── .gitignore              # Excludes secrets, env, build artifacts
+```
+
+---
+
+## 3 | Quick Start
+
+Reproduce dependency install + test suite + CLI smoke check:
+
+```bash
+./reproduce.sh
+```
+
+The script runs `uv sync --extra dev`, executes the pytest suite (if any tests are collected), verifies the `orgschema-validate` CLI installs, and logs run details to `output/logs/master_run.log`.
+
+To validate a target specifications directory directly, see the "Quick Start" section above.
+
+---
+
+## 4 | Dependencies
+
+### Python ≥ 3.12
+
+Runtime dependencies (pinned in `pyproject.toml`):
+
+- `pyyaml >= 6.0`
+- `jsonschema >= 4.20.0`
+
+Development dependencies (install via `uv sync --extra dev`):
+
+- `pytest >= 7.0`
+- `black >= 24.0`, `flake8 >= 7.0`, `mypy >= 1.8`
+- `types-PyYAML`
+
+Install with `uv sync` (runtime) or `uv sync --extra dev` (with dev tools).
+
+---
+
+## 5 | Script Map
+
+| Block | Entry point | Inputs | Outputs |
+|-------|-------------|--------|---------|
+| Validation CLI | `orgschema-validate <path>` | YAML specs at `<path>` | stdout PASS/FAIL summary; exit code 0/1 |
+| Schema files | `orgschema_framework/schemas/*.json` | — | Reused by `validate.py` |
+| Test suite | `pytest` | `tests/` (if present) | `output/logs/master_run.log` |
+| Full reproduction | `./reproduce.sh` | repo root | `output/logs/master_run.log` |
+
+---
+
+## 6 | Citation
+
+If you build on this framework, please cite:
+
+> Dmitry Zharnikov (2026). "Organizational Schema Theory Framework." https://github.com/spectralbranding/orgschema-framework
+
+Machine-readable citation: see [`CITATION.cff`](CITATION.cff). GitHub's "Cite this repository" button, Zotero, Mendeley, and Pandoc all read this format natively.
+
+---
+
+## 7 | Licence
+
+- **Code** — © Dmitry Zharnikov, 2026. [MIT Licence](LICENSE).
+- **Data, schemas, figures, tables** — © Dmitry Zharnikov, 2026. [CC BY 4.0](LICENSE-data).
+
+Both licences permit reuse with attribution. The MIT Licence permits modification and redistribution of code; CC BY 4.0 permits any reuse of data, schemas, and rendered artifacts with attribution to the author.
+
+---
+
+*Last updated: 2026-05-29*
