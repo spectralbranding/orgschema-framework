@@ -77,16 +77,39 @@ Results: 0 errors, 0 warnings
 
 ## Validation Levels
 
-The validator implements 4 of the 6 TDD cascade validation levels:
+The validator implements all 6 TDD cascade validation levels:
 
 | Level | Name | What It Checks |
 |:------|:-----|:---------------|
 | 1 | Schema Validation | YAML files conform to JSON Schema (structure, types, required fields) |
 | 2 | Cross-Reference Integrity | `satisfies_signal` and `satisfies_experience` annotations reference valid targets |
+| 3 | Contract Satisfaction | Every declared L0 `constraint_contracts` / `commitment_contracts` is satisfied: its `validated_by` provider exists, every `satisfies_constraint` / `satisfies_commitment` reference resolves to a declared contract of the matching kind, and no declared contract is left uncovered |
 | 4 | Signal Coverage | Every signal requirement in `perception/signal_requirements.yaml` has at least one satisfying specification |
 | 5 | Experience Traceability | Every product and process traces upward to an L0 customer experience goal |
+| 6 | Waste Detection | Declared units that are never consumed: orphaned `organization.yaml` roles, unconsumed products (no `implemented_by`, no references), empty contracts (no `requires`), and duplicate `implemented_by` allocations |
 
-Levels 3 (contract satisfaction) and 6 (waste detection) are planned for future releases.
+Levels 1–3 emit **errors** (non-zero exit code); Levels 4–6 emit advisory **warnings**.
+
+## Deterministic Query CLI
+
+`orgschema-query` is a plain deterministic query interface over the Level 3 and Level 6 checks — there is **no natural-language / LLM layer**. OrgSchema's constraint space is boolean (a contract is satisfied or it is not; a unit is consumed or it is not), so the appropriate interface is a deterministic query rather than a grounded NL→DSL pipeline. Results are exactly the validator's, so the two tools never disagree.
+
+```bash
+# Run all deterministic checks (contracts + waste) over a schema
+orgschema-query --schema ./orgschema-demo
+
+# Run a single check
+orgschema-query --schema ./orgschema-demo --check contracts
+orgschema-query --schema ./orgschema-demo --check waste
+
+# Select by level number (3 = contracts, 6 = waste)
+orgschema-query --schema ./orgschema-demo --level 6
+
+# Machine-readable JSON output (for CI / tooling)
+orgschema-query --schema ./orgschema-demo --format json
+```
+
+Exit code is `1` when an error-severity check (contracts) reports a violation, else `0` — usable in CI alongside `orgschema-validate`.
 
 ## Schemas
 
@@ -117,7 +140,8 @@ All schemas use JSON Schema Draft 2020-12 and allow additional properties for ex
 orgschema-framework/
 ├── orgschema_framework/
 │   ├── __init__.py
-│   ├── validate.py          # CLI validator (4 validation levels)
+│   ├── validate.py          # CLI validator (6 validation levels)
+│   ├── query.py             # Deterministic query CLI (orgschema-query)
 │   └── schemas/
 │       ├── compliance.json
 │       ├── organization.json
@@ -296,6 +320,7 @@ Install with `uv sync` (runtime) or `uv sync --extra dev` (with dev tools).
 | Block | Entry point | Inputs | Outputs |
 |-------|-------------|--------|---------|
 | Validation CLI | `orgschema-validate <path>` | YAML specs at `<path>` | stdout PASS/FAIL summary; exit code 0/1 |
+| Query CLI | `orgschema-query --schema <path>` | YAML specs at `<path>` | structural text/JSON of L3/L6 violations; exit code 0/1 |
 | Schema files | `orgschema_framework/schemas/*.json` | — | Reused by `validate.py` |
 | Test suite | `pytest` | `tests/` (if present) | `output/logs/master_run.log` |
 | Full reproduction | `./reproduce.sh` | repo root | `output/logs/master_run.log` |
