@@ -1,12 +1,19 @@
 """Organizational Schema Theory YAML schema validator.
 
-Implements the first two levels of the 6-level CI/CD validation pipeline:
+Implements the 6-level CI/CD validation pipeline:
 1. Schema validation — "Is this valid YAML with required fields?"
 2. Cross-reference integrity — "Do all linked specs exist and are consistent?"
+3. Contract satisfaction — "Is every declared L0 contract actually satisfied?"
+4. Signal coverage — "Does every signal requirement have a satisfying spec?"
+5. Experience traceability — "Does every spec trace upward to L0?"
+6. Waste detection — "Are any declared units/roles/contracts never consumed?"
 
 Usage:
     orgschema-validate /path/to/orgschema-demo
     python -m orgschema_framework.validate /path/to/orgschema-demo
+
+For a deterministic, machine-readable query over a single schema directory,
+see orgschema_framework.query (the ``orgschema-query`` CLI).
 """
 
 import datetime
@@ -163,6 +170,147 @@ def validate_cross_references(root: Path) -> list[str]:
     return errors
 
 
+def _load_yaml(filepath: Path):
+    """Safely load a YAML file, returning None on parse error or empty file."""
+    try:
+        with open(filepath) as f:
+            return yaml.safe_load(f)
+    except yaml.YAMLError:
+        return None
+
+
+def _load_experience_contract(root: Path) -> dict | None:
+    """Load the L0 customer experience contract, if present."""
+    exp_path = root / "perception" / "customer_experience_contract.yaml"
+    if not exp_path.exists():
+        return None
+    return _load_yaml(exp_path)
+
+
+def _collect_declared_contracts(contract_data: dict) -> dict[str, dict]:
+    """Extract every declared L0 contract keyed by its id.
+
+    Both ``constraint_contracts`` and ``commitment_contracts`` map a
+    human-readable name to a contract object carrying an ``id`` such as
+    ``L0_con_01`` / ``L0_com_01``. We index by that id and remember which
+    kind it is so contract references can be type-checked.
+    """
+    contracts: dict[str, dict] = {}
+    for section, kind in (
+        ("constraint_contracts", "constraint"),
+        ("commitment_contracts", "commitment"),
+    ):
+        block = contract_data.get(section)
+        if not isinstance(block, dict):
+            continue
+        for _name, contract in block.items():
+            if isinstance(contract, dict) and "id" in contract:
+                entry = dict(contract)
+                entry["_kind"] = kind
+                contracts[contract["id"]] = entry
+    return contracts
+
+
+def validate_contract_satisfaction(root: Path) -> list[str]:
+    """Level 3: Contract satisfaction.
+
+    Every declared L0 contract (constraint or commitment) must actually be
+    satisfied, and every contract reference made by a spec must resolve to a
+    declared contract. Concretely this level enforces:
+
+    1. Provider exists — each contract's ``validated_by`` provider file (the
+       spec that discharges the contract) must exist on disk. A contract that
+       points at a missing provider is an unmet contract.
+    2. No dangling reference — every ``satisfies_constraint`` /
+       ``satisfies_commitment`` annotation on any spec must point at a
+       contract id that is actually declared in the L0 contract, and must use
+       the matching reference key for the contract kind (a constraint id may
+       only appear under ``satisfies_constraint``, a commitment id only under
+       ``satisfies_commitment``).
+    3. No unmet contract — every declared contract must be covered by at
+       least one satisfying spec, either via an existing ``validated_by``
+       provider or via at least one spec that references it.
+
+    Contracts are binding (regulatory / self-imposed obligations), so
+    failures here are errors, mirroring Level 2.
+    """
+    errors: list[str] = []
+
+    contract_data = _load_experience_contract(root)
+    if not contract_data:
+        # No contract file => nothing to satisfy. Other levels report the
+        # missing file; Level 3 stays silent rather than double-reporting.
+        return errors
+
+    declared = _collect_declared_contracts(contract_data)
+    if not declared:
+        return errors
+
+    constraint_ids = {cid for cid, c in declared.items() if c["_kind"] == "constraint"}
+    commitment_ids = {cid for cid, c in declared.items() if c["_kind"] == "commitment"}
+
+    # (1) Provider existence + collect which contracts have a provider.
+    contracts_with_provider: set[str] = set()
+    for cid, contract in sorted(declared.items()):
+        validated_by = contract.get("validated_by")
+        if not validated_by:
+            continue
+        # validated_by may carry a parenthetical note, e.g.
+        # "processes/opening_closing.yaml (safety checks)".
+        provider_file = str(validated_by).split("(")[0].strip()
+        provider_path = root / provider_file
+        if provider_path.exists():
+            contracts_with_provider.add(cid)
+        else:
+            errors.append(
+                f"Unmet contract {cid}: validated_by provider "
+                f"'{provider_file}' does not exist"
+            )
+
+    # (2) Dangling / mistyped references across all specs, and collect which
+    #     contracts are referenced by at least one spec.
+    referenced: set[str] = set()
+    for filepath in sorted(root.glob("**/*.yaml")):
+        if ".github" in str(filepath):
+            continue
+        data = _load_yaml(filepath)
+        if not isinstance(data, dict):
+            continue
+        rel = str(filepath.relative_to(root))
+
+        for key, valid_ids, kind in (
+            ("satisfies_constraint", constraint_ids, "constraint"),
+            ("satisfies_commitment", commitment_ids, "commitment"),
+        ):
+            refs = data.get(key)
+            if not refs:
+                continue
+            for ref in refs:
+                if ref in valid_ids:
+                    referenced.add(ref)
+                elif ref in declared:
+                    other = declared[ref]["_kind"]
+                    errors.append(
+                        f"Contract type mismatch in {rel}: {key} references "
+                        f"'{ref}' which is a {other} contract"
+                    )
+                else:
+                    errors.append(
+                        f"Unsatisfied contract reference in {rel}: {key} "
+                        f"'{ref}' is not a declared {kind} contract"
+                    )
+
+    # (3) Every declared contract must be covered by a provider or a reference.
+    covered = contracts_with_provider | referenced
+    for cid in sorted(set(declared) - covered):
+        errors.append(
+            f"Unmet contract {cid}: no satisfying spec "
+            f"(no existing validated_by provider and no spec references it)"
+        )
+
+    return errors
+
+
 def validate_signal_coverage(root: Path) -> list[str]:
     """Level 4: Signal coverage — are all signal requirements satisfied?"""
     warnings = []
@@ -251,6 +399,144 @@ def validate_experience_traceability(root: Path) -> list[str]:
     return warnings
 
 
+def _walk_strings(node):
+    """Yield every string scalar anywhere inside a nested YAML structure."""
+    if isinstance(node, str):
+        yield node
+    elif isinstance(node, dict):
+        for value in node.values():
+            yield from _walk_strings(value)
+    elif isinstance(node, list):
+        for item in node:
+            yield from _walk_strings(item)
+
+
+def validate_waste(root: Path) -> list[str]:
+    """Level 6: Waste detection.
+
+    Surfaces specification waste — declared organizational units, roles, and
+    contracts that are never actually consumed, plus duplicated coverage.
+    Waste is advisory (it does not break a build), so this level emits
+    warnings, mirroring Levels 4 and 5. Detected forms:
+
+    1. Orphaned roles — a role declared in ``organization.yaml: roles`` that
+       is referenced by no process spec (no ``who``/``responsible`` field and
+       no mention anywhere in a process file).
+    2. Unconsumed products — a product spec under ``products/`` that no signal
+       requirement lists in ``implemented_by`` and that no other spec
+       references by path or id. Such a product satisfies nothing upward.
+    3. Empty contracts — a declared L0 contract whose ``requires`` obligation
+       list is missing or empty (a contract that demands nothing is waste).
+    4. Duplicate coverage — a contract referenced identically by more units
+       than necessary is *not* flagged (redundancy can be intentional), but a
+       product appearing twice in a single signal's ``implemented_by`` is
+       flagged as duplicate allocation.
+
+    Definitions are deliberately conservative: only entities that are
+    declared in one place and consumed nowhere are reported, to avoid noisy
+    false positives.
+    """
+    warnings: list[str] = []
+
+    yaml_files = [f for f in sorted(root.glob("**/*.yaml")) if ".github" not in str(f)]
+    docs = {f: _load_yaml(f) for f in yaml_files}
+
+    # --- (1) Orphaned roles -------------------------------------------------
+    org_path = root / "organization.yaml"
+    org_data = docs.get(org_path)
+    declared_roles = []
+    if isinstance(org_data, dict) and isinstance(org_data.get("roles"), list):
+        declared_roles = [r for r in org_data["roles"] if isinstance(r, str)]
+
+    if declared_roles:
+        # A role counts as "referenced" if its name appears anywhere inside a
+        # process spec — as a structured ``who``/``responsible`` value or in
+        # prose. We join all process strings and test by substring, which is
+        # conservative (a declared role mentioned anywhere is not flagged) and
+        # avoids false positives from singular/plural or compound usages.
+        process_text_parts: list[str] = []
+        for filepath, data in docs.items():
+            rel = str(filepath.relative_to(root))
+            if not rel.startswith("processes/") or not isinstance(data, dict):
+                continue
+            process_text_parts.extend(_walk_strings(data))
+        process_text = "\n".join(process_text_parts)
+        for role in declared_roles:
+            if role not in process_text:
+                warnings.append(
+                    f"Waste: role '{role}' declared in organization.yaml "
+                    f"is never referenced by any process spec"
+                )
+
+    # --- (2) Unconsumed products -------------------------------------------
+    product_files = {
+        filepath: data
+        for filepath, data in docs.items()
+        if str(filepath.relative_to(root)).startswith("products/")
+        and isinstance(data, dict)
+    }
+
+    # Collect all implemented_by references and per-signal duplicates (4).
+    implemented_paths: set[str] = set()
+    sig_req_path = root / "perception" / "signal_requirements.yaml"
+    sig_data = docs.get(sig_req_path)
+    if isinstance(sig_data, dict):
+        for req in sig_data.get("signal_requirements", []) or []:
+            impls = req.get("implemented_by") if isinstance(req, dict) else None
+            if not impls:
+                continue
+            implemented_paths.update(impls)
+            seen: set[str] = set()
+            for impl in impls:
+                if impl in seen:
+                    warnings.append(
+                        f"Waste: duplicate allocation — signal "
+                        f"{req.get('id', '?')} lists '{impl}' more than once "
+                        f"in implemented_by"
+                    )
+                seen.add(impl)
+
+    # Any string anywhere outside the product file itself that mentions its
+    # path or id counts as consumption.
+    for filepath, data in product_files.items():
+        rel = str(filepath.relative_to(root))
+        product_id = data.get("id") if isinstance(data, dict) else None
+
+        if rel in implemented_paths:
+            continue
+
+        consumed = False
+        for other_path, other_data in docs.items():
+            if other_path == filepath:
+                continue
+            for s in _walk_strings(other_data):
+                if rel in s or (product_id and product_id == s):
+                    consumed = True
+                    break
+            if consumed:
+                break
+
+        if not consumed:
+            warnings.append(
+                f"Waste: product {rel} is unconsumed — no signal "
+                f"implemented_by and no other spec references it"
+            )
+
+    # --- (3) Empty contracts ------------------------------------------------
+    contract_data = _load_experience_contract(root)
+    if contract_data:
+        declared = _collect_declared_contracts(contract_data)
+        for cid, contract in sorted(declared.items()):
+            requires = contract.get("requires")
+            if not requires:
+                warnings.append(
+                    f"Waste: contract {cid} declares no obligations "
+                    f"(empty or missing 'requires')"
+                )
+
+    return warnings
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: orgschema-validate <path-to-orgschema-demo>")
@@ -283,6 +569,16 @@ def main():
     else:
         print("  PASSED")
 
+    # Level 3: Contract satisfaction
+    print("Level 3: Contract satisfaction...")
+    contract_errors = validate_contract_satisfaction(root)
+    for err in contract_errors:
+        print(f"  ERROR: {err}")
+    if contract_errors:
+        exit_code = 1
+    else:
+        print("  PASSED")
+
     # Level 4: Signal coverage
     print("Level 4: Signal coverage...")
     coverage_warnings = validate_signal_coverage(root)
@@ -299,9 +595,17 @@ def main():
     if not trace_warnings:
         print("  PASSED")
 
+    # Level 6: Waste detection
+    print("Level 6: Waste detection...")
+    waste_warnings = validate_waste(root)
+    for warn in waste_warnings:
+        print(f"  WARNING: {warn}")
+    if not waste_warnings:
+        print("  PASSED")
+
     # Summary
-    total_errors = len(schema_errors) + len(xref_errors)
-    total_warnings = len(coverage_warnings) + len(trace_warnings)
+    total_errors = len(schema_errors) + len(xref_errors) + len(contract_errors)
+    total_warnings = len(coverage_warnings) + len(trace_warnings) + len(waste_warnings)
     print(f"\nSummary: {total_errors} errors, {total_warnings} warnings")
 
     sys.exit(exit_code)
