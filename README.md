@@ -23,7 +23,7 @@ This framework provides the **validation tooling**: JSON schemas and a CLI valid
 
 ## Installation
 
-Requires Python 3.14+.
+Requires Python 3.14.
 
 ```bash
 # Clone the framework
@@ -245,7 +245,7 @@ git clone https://github.com/spectralbranding/orgschema-framework.git
 cd orgschema-framework
 ```
 
-Python dependencies are managed via `uv` (Python ≥ 3.14):
+Python dependencies are managed via `uv` (Python 3.14):
 
 ```bash
 uv sync --extra dev
@@ -298,7 +298,7 @@ To validate a target specifications directory directly, see the "Quick Start" se
 
 ## 4 | Dependencies
 
-### Python ≥ 3.14
+### Python 3.14
 
 Runtime dependencies (pinned in `pyproject.toml`):
 

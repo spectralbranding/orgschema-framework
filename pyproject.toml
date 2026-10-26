@@ -2,7 +2,7 @@
 name = "orgschema-framework"
 version = "0.1.0"
 description = "Schema validator for Organizational Schema Theory reverse-design TDD specifications"
-requires-python = ">=3.14"
+requires-python = ">=3.14,<3.15"
 dependencies = [
     "pyyaml>=6.0",
     "jsonschema>=4.20.0",
