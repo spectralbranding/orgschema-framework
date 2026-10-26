@@ -1,0 +1,27 @@
+==================================================
+Pipeline run: 2026-10-26T11:39:49Z
+Repo: /Users/d/projects/orgschema-framework
+Git SHA: 9538601287a1f6a597f29b10b2a2aca02ed68c9e
+==================================================
+>>> Checking dependencies (uv sync)...
+Resolved 27 packages in 2ms
+warning: Skipping installation of entry points (`project.scripts`) for package `orgschema-framework` because this project is not packaged; to install entry points, set `tool.uv.package = true` or define a `build-system`
+Checked 25 packages in 3ms
+>>> Running test suite (pytest)...
+============================= test session starts ==============================
+platform darwin -- Python 3.14.9, pytest-9.0.2, pluggy-1.6.0
+rootdir: /Users/d/projects/orgschema-framework
+configfile: pyproject.toml
+testpaths: tests
+collected 16 items
+
+tests/test_query_cli.py ......                                           [ 37%]
+tests/test_validate_l3_l6.py ..........                                  [100%]
+
+============================== 16 passed in 0.07s ==============================
+>>> Verifying orgschema-validate CLI installs...
+error: Failed to spawn: orgschema-validate
+  cause: No such file or directory (os error 2)
+==================================================
+Pipeline complete: 2026-10-26T11:39:50Z
+==================================================
