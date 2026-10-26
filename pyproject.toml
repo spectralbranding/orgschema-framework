@@ -18,6 +18,10 @@ dev = [
 orgschema-validate = "orgschema_framework.validate:main"
 orgschema-query = "orgschema_framework.query:main"
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [dependency-groups]
 dev = [
     "black>=26.3.1",
@@ -28,10 +32,6 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-# The project is consumed as a source tree (no build-system); add the repo
-# root to sys.path so tests can import the orgschema_framework package the
-# same way `python -m orgschema_framework.validate` resolves it.
-pythonpath = ["."]
 testpaths = ["tests"]
 
 [tool.mypy]
