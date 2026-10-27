@@ -16,6 +16,7 @@ For a deterministic, machine-readable query over a single schema directory,
 see orgschema_framework.query (the ``orgschema-query`` CLI).
 """
 
+import argparse
 import datetime
 import json
 import sys
@@ -537,12 +538,23 @@ def validate_waste(root: Path) -> list[str]:
     return warnings
 
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: orgschema-validate <path-to-orgschema-demo>")
-        sys.exit(1)
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="orgschema-validate",
+        description="Run the 6-level OrgSchema validation pipeline on a directory.",
+    )
+    parser.add_argument(
+        "path",
+        type=Path,
+        help="Path to the orgschema directory (for example orgschema-demo).",
+    )
+    return parser
 
-    root = Path(sys.argv[1]).resolve()
+
+def main(argv: list[str] | None = None):
+    args = build_parser().parse_args(argv)
+
+    root = args.path.resolve()
     if not root.is_dir():
         print(f"Error: {root} is not a directory")
         sys.exit(1)
