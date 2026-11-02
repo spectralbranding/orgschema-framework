@@ -1,6 +1,6 @@
 ==================================================
 Pipeline run: 2026-10-26T11:39:49Z
-Repo: /Users/d/projects/orgschema-framework
+Repo: <repo>
 Git SHA: 9538601287a1f6a597f29b10b2a2aca02ed68c9e
 ==================================================
 >>> Checking dependencies (uv sync)...
@@ -10,7 +10,7 @@ Checked 25 packages in 3ms
 >>> Running test suite (pytest)...
 ============================= test session starts ==============================
 platform darwin -- Python 3.14.9, pytest-9.0.2, pluggy-1.6.0
-rootdir: /Users/d/projects/orgschema-framework
+rootdir: <repo>
 configfile: pyproject.toml
 testpaths: tests
 collected 16 items
