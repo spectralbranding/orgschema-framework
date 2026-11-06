@@ -1,27 +1,65 @@
 ==================================================
-Pipeline run: 2026-10-26T11:39:49Z
+Pipeline run: 2026-11-06T07:45:57Z
 Repo: <repo>
-Git SHA: 9538601287a1f6a597f29b10b2a2aca02ed68c9e
+Git SHA: 3e8e29a94c0c2e22c0d606786d19fd0c7c818d51
 ==================================================
 >>> Checking dependencies (uv sync)...
-Resolved 27 packages in 2ms
-warning: Skipping installation of entry points (`project.scripts`) for package `orgschema-framework` because this project is not packaged; to install entry points, set `tool.uv.package = true` or define a `build-system`
-Checked 25 packages in 3ms
+Using CPython 3.14.9
+Creating virtual environment at: .venv
+Resolved 27 packages in 3ms
+   Building orgschema-framework @ file://<repo>
+      Built orgschema-framework @ file://<repo>
+Prepared 1 package in 460ms
+Installed 26 packages in 48ms
+ + attrs==25.4.0
+ + black==26.5.1
+ + click==8.3.1
+ + flake8==7.3.0
+ + iniconfig==2.3.0
+ + jsonschema==4.26.0
+ + jsonschema-specifications==2025.9.1
+ + librt==0.8.1
+ + mccabe==0.7.0
+ + mypy==1.19.1
+ + mypy-extensions==1.1.0
+ + orgschema-framework==0.1.0 (from file://<repo>)
+ + packaging==26.0
+ + pathspec==1.0.4
+ + platformdirs==4.9.2
+ + pluggy==1.6.0
+ + pycodestyle==2.14.0
+ + pyflakes==3.4.0
+ + pygments==2.19.2
+ + pytest==9.0.2
+ + pytokens==0.4.1
+ + pyyaml==6.0.3
+ + referencing==0.37.0
+ + rpds-py==0.30.0
+ + types-pyyaml==6.0.12.20250915
+ + typing-extensions==4.15.0
 >>> Running test suite (pytest)...
 ============================= test session starts ==============================
 platform darwin -- Python 3.14.9, pytest-9.0.2, pluggy-1.6.0
 rootdir: <repo>
 configfile: pyproject.toml
 testpaths: tests
-collected 16 items
+collected 17 items
 
-tests/test_query_cli.py ......                                           [ 37%]
+tests/test_query_cli.py ......                                           [ 35%]
+tests/test_validate_cli.py .                                             [ 41%]
 tests/test_validate_l3_l6.py ..........                                  [100%]
 
-============================== 16 passed in 0.07s ==============================
+============================== 17 passed in 0.08s ==============================
 >>> Verifying orgschema-validate CLI installs...
-error: Failed to spawn: orgschema-validate
-  cause: No such file or directory (os error 2)
+usage: orgschema-validate [-h] path
+
+Run the 6-level OrgSchema validation pipeline on a directory.
+
+positional arguments:
+  path        Path to the orgschema directory (for example orgschema-demo).
+
+options:
+  -h, --help  show this help message and exit
 ==================================================
-Pipeline complete: 2026-10-26T11:39:50Z
+Pipeline complete: 2026-11-06T07:45:59Z
 ==================================================
